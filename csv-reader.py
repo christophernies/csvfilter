@@ -2,7 +2,7 @@ import sys
 import csv
 
 source_file = 'data2.csv'
-filter_set = {'unique_id':'20-', 'height_in_inches':'90+','weight_in_pounds':'180+'}
+filter_set = {'unique_id':'1+', 'height_in_inches':'10+','weight_in_pounds':'40+','name':'John'}
 labeled_row = {}
 schema = []
 
@@ -24,10 +24,10 @@ def is_number(s):
 
 
 def apply_filters(filters,row, schema):
-    #iterate over all fields in the schema
+    #iterate over all fields in the filter list
     for field_name in filters.keys():
         print_row = False
-        #only bother with fields that are in the list of filters
+        #only bother with filters that are in the schema
         if field_name in schema:
             if is_number(row[field_name]):
                 try:
@@ -60,8 +60,15 @@ def apply_filters(filters,row, schema):
                 except KeyError:
                     continue
             else:
-                print "not a number"
-                break
+                try:
+                    #check for an exact match
+                    if row[field_name] == filters[field_name]:
+                        print_row = True
+                        continue
+                    else:
+                        break
+                except KeyError:
+                    continue
     if print_row:
         print row
         
