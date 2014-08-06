@@ -2,7 +2,7 @@ import sys
 import csv
 
 source_file = 'data2.csv'
-filter_set = {'unique_id':'1+', 'height_in_inches':'10+','weight_in_pounds':'40+','name':'John'}
+filter_set = {'unique_id':'10+', 'height_in_inches':'90+','weight_in_pounds':'80+'}
 labeled_row = {}
 schema = []
 
