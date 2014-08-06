@@ -3,7 +3,7 @@ import csv
 
 #settings
 source_file = 'data.csv'
-filter_set = {'name':'Michael'}
+filter_set = {'name':'Michael','height_in_inches':'60+'}
 labeled_row = {}
 schema = []
 row_count = 0
@@ -39,7 +39,11 @@ def apply_filters(filters,row, schema):
             if is_number(row[field_name]):
                 try:
                     operator = filters[field_name][-1:]
-                    
+                    #determine value portion of filter
+                    value = filters[field_name][:-1]
+                    #if the row contains a number but the filter is invalid, return an error
+                    if not is_number(value):
+                        return "Invalid filter"
                     #if there is no operator, or the equals sign is used, look for exact value
                     if is_number(operator) or operator == '=':
                         if float(row[field_name]) == float(filters[field_name][:-1]):
@@ -69,6 +73,9 @@ def apply_filters(filters,row, schema):
                         else:
                             #abandon the loop - the filter failed
                             break
+                    #if no valid filters are present, return an error
+                    else:
+                        return "Invalid filter"
                 #I believe this is actually unnecessary and a throwback to an alternate algorithm I was using
                 except KeyError:
                     continue
@@ -118,6 +125,9 @@ for row in data:
 
     #evaluate the row based on the filter and print if appropriate
     print_row = apply_filters(filter_set,labeled_row, schema)
+    if print_row == "Invalid filter":
+        print "Invalid filter"
+        break
     if print_row != None:
         print print_row
         row_count += 1
