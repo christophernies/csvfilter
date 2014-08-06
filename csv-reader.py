@@ -3,9 +3,10 @@ import csv
 
 #settings
 source_file = 'data.csv'
-filter_set = {'name':'John'}
+filter_set = {'name':'Michael'}
 labeled_row = {}
 schema = []
+row_count = 0
 
 def open_file(source_file):
     #open csv filestream
@@ -86,7 +87,7 @@ def apply_filters(filters,row, schema):
                     continue
     #if, at the end of the loop, the print flag is set to "True", print the row
     if print_row:
-        print row
+        return row
         
 
 def create_schema(data):
@@ -114,5 +115,11 @@ schema = create_schema(data)
 for row in data:
     #generate the header/row data dictionary
     labeled_row = apply_schema(schema,row)
+
     #evaluate the row based on the filter and print if appropriate
-    apply_filters(filter_set,labeled_row, schema)
+    print_row = apply_filters(filter_set,labeled_row, schema)
+    if print_row != None:
+        print print_row
+        row_count += 1
+
+print str(row_count) + " rows match the following criteria: " + str(filter_set)
