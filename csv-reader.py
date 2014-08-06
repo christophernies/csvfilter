@@ -2,7 +2,7 @@ import sys
 import csv
 
 source_file = 'data2.csv'
-filter_set = {'unique_id':'10-', 'height_in_inches':'100+'}
+filter_set = {'unique_id':'20-', 'height_in_inches':'90+','weight_in_pounds':'180+'}
 labeled_row = {}
 schema = []
 
@@ -24,48 +24,46 @@ def is_number(s):
 
 
 def apply_filters(filters,row, schema):
-    for field_name in schema:
+    #iterate over all fields in the schema
+    for field_name in filters.keys():
+        print_row = False
+        #only bother with fields that are in the list of filters
+        if field_name in schema:
+            if is_number(row[field_name]):
+                try:
+                    operator = filters[field_name][-1:]
+                    
+                    #if there is no operator, or the equals sign is used, look for exact value
+                    if is_number(operator) or operator == '=':
+                        if float(row[field_name]) == float(filters[field_name][:-1]):
+                            print_row = True
+                            continue
+                        else:
+                            break
 
-        if is_number(row[field_name]):
-            
-            try:
-                #determine which operator is being used
-                operator = filters[field_name][-1:]
-               
-                #if there is no operator, or the equals sign is used, look for exact value
-                if is_number(operator) or operator == '=':
-                    if float(row[field_name]) == float(filters[field_name][:-1]):
-                        continue
-                    else:
-                        break
-                
-                #if the operator is less than or minus, look for values less than the value
-                elif operator == "<" or operator == "-":
-                    if float(row[field_name]) <= float(filters[field_name][:-1]):
-                        continue
-                    else:
-                        break
-                
-                #if the operator is greater than or plus, look for values more than the value
-                elif operator == ">" or operator == "+":
-                    if float(row[field_name]) >= float(filters[field_name][:-1]):
-                        continue
-                    else:
-                        break
-            
-            except KeyError:
-                continue
-            except ValueError:
-                break
-        else:
-            try:
-                if row[field_name] == filters[field_name]:
+                    #if the operator is less than or minus, look for values less than the value
+                    elif operator == "<" or operator == "-":
+                        if float(row[field_name]) <= float(filters[field_name][:-1]):
+                            print_row = True
+                            continue
+                        else:
+                            break
+
+                    #if the operator is greater than or plus, look for values more than the value
+                    elif operator == ">" or operator == "+":
+                        if float(row[field_name]) >= float(filters[field_name][:-1]):
+                            print_row = True
+                            continue
+                        else:
+                            break
+
+                except KeyError:
                     continue
-                else:
-                    break
-            except KeyError:
-                continue
-        return row
+            else:
+                print "not a number"
+                break
+    if print_row:
+        print row
         
 
 def create_schema(data):
@@ -85,6 +83,4 @@ schema = create_schema(data)
 
 for row in data:
     labeled_row = apply_schema(schema,row)
-    value = apply_filters(filter_set,labeled_row, schema)
-    if value != None:
-        print value
+    apply_filters(filter_set,labeled_row, schema)
